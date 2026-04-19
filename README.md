@@ -22,3 +22,6 @@ Documenting Code Implementations and Reflections from Learning Design Patterns
 2. 进入目录: `cd Cpp20-Design-Patterns`
 3. 创建构建目录: `mkdir build && cd build`
 4. 编译: `cmake .. && cmake --build .`
+
+## 📂 目录结构
+详见docs/Project_Structure.md

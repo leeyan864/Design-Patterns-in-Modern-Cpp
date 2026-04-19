@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.16)
+project(DesignPatternsCpp20 LANGUAGES CXX)
+
+# 设置 C++20 标准
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 设置二进制输出位置
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# 让 CMake 去 src 目录下找东西
+add_subdirectory(src)
