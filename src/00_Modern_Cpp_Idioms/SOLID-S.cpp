@@ -41,9 +41,17 @@ void Journal::save(const string& filename){
     }
 }
 
-
-// ================开闭原则================
-
+// 所以下面这种在一个单独的类里面实现要好的多。
+// 这也就是说把这个‘好动的猫’关起来
+struct PersistenceManager
+{
+    static void save(const Journal& j, const string& filename)
+    {
+        ofstream ofs(filename);
+        for (auto& s: j.entries)
+            ofs << s << endl;
+    }
+};
 
 int main() {
   Journal j1("Dear Diary", 3.14);
