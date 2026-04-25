@@ -24,33 +24,32 @@ struct Journal {
   // 关于这里学到的新知识点，用title{}初始化而不是传统的title().
   // {}可以防止精度丢失，还有一致性可以告诉编译器这是在初始化，而不是函数声明.
 
-    void add(const string& entry);
+  void add(const string &entry);
 };
-// 添加一条日记条目是日记实际上需要做的事情，所以将此函数作为 Journal 类的一部分是有意义的.
-void Journal::add(const string& entry){
-    struct cint count = 1;
-    entries.push_back();
+// 添加一条日记条目是日记实际上需要做的事情，所以将此函数作为 Journal
+// 类的一部分是有意义的.
+void Journal::add(const string &entry) {
+  struct cint count = 1;
+  entries.push_back();
 }
 // 现在你打算把日记保存到文件，就添加save函数.
 // 但这有个问题，如果后面我们的设计里其他类也有save函数，后续有个关于save的改动（比如写到服务器而不是磁盘）.
 // 就会难以维护，这就是代码里面的坏味道.
-void Journal::save(const string& filename){
-    ofstream ofs(filename);
-    for(auto& s: entries){
-        ofs << s << endl;
-    }
+void Journal::save(const string &filename) {
+  ofstream ofs(filename);
+  for (auto &s : entries) {
+    ofs << s << endl;
+  }
 }
 
 // 所以下面这种在一个单独的类里面实现要好的多。
 // 这也就是说把这个‘好动的猫’关起来
-struct PersistenceManager
-{
-    static void save(const Journal& j, const string& filename)
-    {
-        ofstream ofs(filename);
-        for (auto& s: j.entries)
-            ofs << s << endl;
-    }
+struct PersistenceManager {
+  static void save(const Journal &j, const string &filename) {
+    ofstream ofs(filename);
+    for (auto &s : j.entries)
+      ofs << s << endl;
+  }
 };
 
 int main() {
