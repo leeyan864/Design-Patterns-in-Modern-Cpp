@@ -66,9 +66,13 @@ ProductFilter::Items ProductFilter::by_color_and_size(Items items, Size size,
 // 筛选器（接收所有项返回一些项）和规范（用于数据元素的谓词）
  */
 
+// 前向声明
+template <typename T> struct AndSpecification;
+
 // 给规范接口定义，要筛选就要继承这个规范接口
 template <typename T> struct Specification {
-  virtual bool is_satisfied(T *item) = 0;
+  virtual bool is_satisfied(T *item) const = 0;
+  AndSpecification<T> operator&&(const Specification<T> &other);
 };
 
 // 定义一个基于规范接口的过滤方法
@@ -96,7 +100,7 @@ struct ColorSpecification : public Specification<Product> {
   Color color;
 
   explicit ColorSpecification(const Color color) : color{color} {}
-  bool is_satisfied(Product *item) override { return item->color == color; }
+  bool is_satisfied(Product *item) const override { return item->color == color; }
 };
 
 // 实现尺寸比较的规范
@@ -104,21 +108,26 @@ struct SizeSpecification : public Specification<Product> {
   Size size;
 
   explicit SizeSpecification(const Size size) : size{size} {}
-  bool is_satisfied(Product *item) override { return item->size == size; }
+  bool is_satisfied(Product *item) const override { return item->size == size; }
 };
 
 // 还可以实现更复杂的规范,可以写一个AND规范
 template <typename T> struct AndSpecification : public Specification<T> {
-  Specification<T> &first;
-  Specification<T> &second;
+  const Specification<T> &first;
+  const Specification<T> &second;
 
-  AndSpecification(Specification<T> &first, Specification<T> &second)
+  AndSpecification(const Specification<T> &first,const Specification<T> &second)
       : first{first}, second{second} {}
-  bool is_satisfied(T *items) override {
+  bool is_satisfied(T *items) const override {
     return first.is_satisfied(items) && second.is_satisfied(items);
   }
 };
 
+// 还可以借助运算符重载，创建多个的时候让code更整洁
+template<typename T>
+AndSpecification<T> Specification<T>::operator&&(const Specification &other) {
+  return AndSpecification<T>(*this, other);
+}
 int main() {
   Product apple{"Apple", Color::Green, Size::Small};
   Product tree{"Tree", Color::Green, Size::Large};
@@ -128,6 +137,7 @@ int main() {
   BetterFilter bf;
   ColorSpecification green(Color::Green);
   SizeSpecification large(Size::Large);
+
   // 目前这里也有大量重复code，后续学了其他的也可以优化一下
   auto green_things = bf.filter(all, green);
   for (auto &x : green_things) {
@@ -143,6 +153,12 @@ int main() {
   AndSpecification<Product> green_and_large{large, green};
 
   auto big_green_things = bf.filter(all, green_and_large);
+  for (auto &x : big_green_things) {
+    std::cout << x->name << " is large and green" << std::endl;
+  }
+
+  // 使用&&运算符
+  auto green_and_big = green && large;
   for (auto &x : big_green_things) {
     std::cout << x->name << " is large and green" << std::endl;
   }
