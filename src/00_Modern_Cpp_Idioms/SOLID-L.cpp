@@ -48,6 +48,16 @@ void process(Rectangle &r) {
   std::cout << "expected area = " << (w * 10) << ", got " << r.area()
             << std::endl;
 }
+
+
+// 解决办法，我认为类型Square甚至不应该存在
+// 相反，我们可以创建一个工厂（参见第3章）来创建矩形和正方形
+struct RectangleFactory
+{
+    static Rectangle create_rectangle(int w, int h);
+    static Rectangle create_square(int size);
+};
+
 int main() {
   Square s{5};
   process(s); // expected area = 50, got 25
