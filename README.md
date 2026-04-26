@@ -9,8 +9,11 @@ Documenting Code Implementations and Reflections from Learning Design Patterns
 
 ## 📚 目录进度
 - [x] **第 1 部分：SOLID 原则**
-  - [x] 单一职责原则 (SRP)
-  - [ ] 开闭原则 (OCP)
+  - [x] 单一职责原则
+  - [x] 开闭原则
+  - [ ] 里氏替换原则
+  - [ ] 接口隔离原则
+  - [ ] 依赖倒置原则
 - [ ] **第 2 部分：创建型模式**
   - [ ] 构建者模式 (Builder)
   - [ ] 工厂模式 (Factory)
