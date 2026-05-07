@@ -80,6 +80,31 @@ void example3()
     std::cout << builder.str() << std::endl;
 }
 
+// example3已经做的很好了，但还可以配合链式调用使用
+struct HtmlBuilderFLuent
+{
+    HtmlElement root;
+
+    HtmlBuilderFLuent(std::string root_name) { root.name = root_name; }
+
+    HtmlBuilderFLuent &add_child(std::string child_name, std::string child_text)
+    {
+        HtmlElement e{child_name, child_text};
+        root.elements.emplace_back(e);
+        return *this;
+    }
+
+    std::string str() { return root.str(); }
+};
+
+void example4()
+{
+    HtmlBuilderFLuent builder{"ul"};
+    builder.add_child("li", "hello")
+        .add_child("li", "world");
+    std::cout << builder.str() << std::endl;
+}
+
 int main()
 {
     example1();
