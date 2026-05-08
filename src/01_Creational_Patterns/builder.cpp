@@ -105,11 +105,149 @@ void example4()
     std::cout << builder.str() << std::endl;
 }
 
+// 书中讲的Gro0vey没学明白，省略
+
+// 组合构造器
+// 假设记录关于一个人的信息Person的成员变量中包含:地址信息和就业信息
+// 如果我们想为这两类信息提供单独的建造者，为此将构建一个复合建造者。
+class PersonAddressBuilder;
+class PersonJobBuilder;
+class PersonBuilder;
+
+class Person
+{
+    // address
+    std::string street_address, post_code, city;
+    // employment
+    std::string company_name, position;
+    int annual_income = 0;
+    Person() {}
+
+public:
+    // 静态工厂方法，开启链式调用
+    static PersonBuilder create();
+    // 效果展示函数
+    std::string to_string() const
+    {
+        std::ostringstream oss;
+        oss << "--- Person Details ---\n"
+            << "Address: " << street_address << ", " << post_code << ", " << city << "\n"
+            << "Employment: " << company_name << " as a " << position
+            << " (Earning " << annual_income << ")\n";
+        return oss.str();
+    }
+
+    friend class PersonBuilderBase;
+    friend class PersonAddressBuilder;
+    friend class PersonJobBuilder;
+    friend class PersonBuilder;
+};
+
+// 这里只是用了person的引用而不存储person
+// 拷贝构造函数声明为protected，只有派生类可以使用它
+// operator Person() 转换运算符，神技
+// lives和works是两个返回构建者的函数：分别完成对地址/工作的构建
+class PersonBuilderBase
+{
+protected:
+    Person &person;
+    explicit PersonBuilderBase(Person &person) : person{person} {}
+
+public:
+    operator Person() { return std::move(person); }
+    // builder facets
+    PersonAddressBuilder lives() const;
+    PersonJobBuilder works() const;
+};
+
+// 上一个基类中唯一缺少的是正在构造的实际对象
+// 它存储在PersonBuilder的继承者中,这是希望实际使用的类
+class PersonBuilder : public PersonBuilderBase
+{
+    // 实际的对象
+    Person p;
+
+public:
+    PersonBuilder() : PersonBuilderBase{p} {}
+};
+
+class PersonAddressBuilder : public PersonBuilderBase
+{
+public:
+    explicit PersonAddressBuilder(Person &person) : PersonBuilderBase{person} {}
+    PersonAddressBuilder &at(std::string street_address)
+    {
+        person.street_address = street_address;
+        return *this;
+    }
+    PersonAddressBuilder &in(std::string city)
+    {
+        person.city = city;
+        return *this;
+    }
+    PersonAddressBuilder &with_postcode(std::string post_code)
+    {
+        person.post_code = post_code;
+        return *this;
+    }
+};
+
+class PersonJobBuilder : public PersonBuilderBase
+{
+public:
+    explicit PersonJobBuilder(Person &person) : PersonBuilderBase{person} {}
+    PersonJobBuilder &at(std::string company_name)
+    {
+        person.company_name = company_name;
+        return *this;
+    }
+    PersonJobBuilder &as_a(std::string position)
+    {
+        person.position = position;
+        return *this;
+    }
+    PersonJobBuilder &earning(int annual_income)
+    {
+        person.annual_income = annual_income;
+        return *this;
+    }
+};
+
+PersonBuilder Person::create()
+{
+    return PersonBuilder{};
+}
+
+PersonAddressBuilder PersonBuilderBase::lives() const
+{
+    return PersonAddressBuilder{person};
+}
+
+PersonJobBuilder PersonBuilderBase::works() const
+{
+    return PersonJobBuilder{person};
+}
+
+void example5()
+{
+    Person p = Person::create()
+                   .lives()
+                   .at("123 London Road")
+                   .with_postcode("SW1 1GB")
+                   .in("London")
+                   .works()
+                   .at("PragmaSoft")
+                   .as_a("Consultant")
+                   .earning(16);
+    std::cout << p.to_string() << std::endl;
+}
+
 int main()
 {
     example1();
     example2();
     example3();
     example4();
+    example5();
     return 0;
 }
