@@ -213,6 +213,10 @@ public:
     }
 };
 
+
+// 很多情况下习惯把函数直接写在类定义里（即inline实现），但这个场景下，直接写在类里面会触发编译器的“死循环”逻辑
+// 读取Person类的create()函数返回一个PersonBuilder对象。查找PersonBuilder此时编译器只看到了前置声明的class PersonBuilder;
+// 它知道有这个名字，但不知道这个类的大小和内部结构，所以只能在PersonBuilder实现后实现
 PersonBuilder Person::create()
 {
     return PersonBuilder{};
