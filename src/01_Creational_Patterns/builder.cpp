@@ -315,6 +315,10 @@ void example6()
                             { eb.from("leey@xx.com").to("jiali@xx.com").subject("hello").body("hello,how are you?"); });
 }
 
+// 构造器模式的继承性
+// 流式构造器怎么继承一个流式构造器
+// ...没学明白，后面再回看
+
 int main()
 {
     example1();
