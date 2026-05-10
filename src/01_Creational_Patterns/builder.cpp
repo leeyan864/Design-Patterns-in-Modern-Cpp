@@ -213,7 +213,6 @@ public:
     }
 };
 
-
 // 很多情况下习惯把函数直接写在类定义里（即inline实现），但这个场景下，直接写在类里面会触发编译器的“死循环”逻辑
 // 读取Person类的create()函数返回一个PersonBuilder对象。查找PersonBuilder此时编译器只看到了前置声明的class PersonBuilder;
 // 它知道有这个名字，但不知道这个类的大小和内部结构，所以只能在PersonBuilder实现后实现
@@ -244,6 +243,9 @@ void example5()
                    .as_a("Consultant")
                    .earning(16);
     std::cout << p.to_string() << std::endl;
+    // 构建者模式可以挡住不合法的对象创建，比如要当住下面这种对象的构建，可以在转换操作符里面加上if判断是否为空
+    Person p1 = Person::create();
+    std::cout << p1.to_string() << std::endl;
 }
 
 int main()
