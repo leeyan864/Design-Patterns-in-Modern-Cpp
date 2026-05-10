@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <functional>
 
 // 假设我们正在构建一个呈现web页面的组件
 // 先输出一个无序列表，其中有两个item，包括两个单词
@@ -248,6 +249,72 @@ void example5()
     std::cout << p1.to_string() << std::endl;
 }
 
+// 参数化构造器
+// 如前面所言，强制用户使用构造器而不是直接构造对象的唯一办法是使构造函数不可访问
+// 在某些情况下我们想要明确的强制用户一开始就与构造器打交道，甚至隐藏我们正在构建的对象
+
+// 强制用户之通过构造器发送邮件
+class MailService
+{
+    class Email
+    {
+    public:
+        std::string from, to, subject, body;
+    };
+
+public:
+    class EmailBuilderFluent
+    {
+        Email &email;
+
+    public:
+        explicit EmailBuilderFluent(Email &email) : email{email} {}
+        EmailBuilderFluent &from(std::string from)
+        {
+            email.from = from;
+            return *this;
+        }
+        EmailBuilderFluent &to(std::string to)
+        {
+            email.to = to;
+            return *this;
+        }
+        EmailBuilderFluent &subject(std::string subject)
+        {
+            email.subject = subject;
+            return *this;
+        }
+        EmailBuilderFluent &body(std::string body)
+        {
+            email.body = body;
+            return *this;
+        }
+    };
+    void send_email(std::function<void(EmailBuilderFluent &)> builder)
+    {
+        Email email;
+        EmailBuilderFluent b{email};
+        builder(b);
+        send_email_impl(email);
+    }
+
+private:
+    void send_email_impl(Email &email)
+    {
+        std::cout << "Sending email from: " << email.from << "\n"
+                  << "To: " << email.to << "\n"
+                  << "Subject: " << email.subject << std::endl;
+        // 实际发送逻辑
+    }
+};
+
+void example6()
+{
+    MailService mail_service;
+    mail_service.send_email([&](auto &eb)
+                            { eb.from("leey@xx.com").to("jiali@xx.com").subject("hello").body("hello,how are you?"); });
+}
+
 int main()
 {
     example1();
@@ -255,5 +322,6 @@ int main()
     example3();
     example4();
     example5();
+    example6();
     return 0;
 }
